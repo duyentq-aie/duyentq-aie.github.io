@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tran Quang Duyen — AI Engineer</title>
+<meta name="description" content="AI engineer building LLM applications that are measured before they ship: RAG, agents, evaluation and observability.">
+<meta property="og:title" content="Tran Quang Duyen — AI Engineer">
+<meta property="og:description" content="RAG + agent systems, evaluated on a locked test set and traced end to end.">
+<meta property="og:image" content="assets/monitor-flow.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* pipeline colours: each stage keeps its colour everywhere on the page */
+  --c-intent:#6C8CFF; --c-filter:#A78BFA; --c-retrieval:#2DD4BF; --c-answer:#FBBF24; --c-guard:#FB7185;
+  --night:#0C0F2E; --night-2:#141842; --night-line:#272C5C; --night-ink:#EEF0FF; --night-muted:#A3A8D6;
+  --bg:#F4F5FB; --surface:#FFFFFF; --ink:#12142B; --muted:#565B7A; --line:#DFE1EE;
+  --accent:#4253D6; --accent-tint:#E8EBFC; --warn:#A35A00; --warn-tint:#FFF1D9;
+  --display:"Bricolage Grotesque","Instrument Sans",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0A0C22; --surface:#13163A; --ink:#ECEEFF; --muted:#A3A8D6; --line:#262B5A;
+    --accent:#8E9BFF; --accent-tint:#1D2156; --warn:#F2B04E; --warn-tint:#33260F;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0A0C22; --surface:#13163A; --ink:#ECEEFF; --muted:#A3A8D6; --line:#262B5A;
+  --accent:#8E9BFF; --accent-tint:#1D2156; --warn:#F2B04E; --warn-tint:#33260F;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "Instrument Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{max-width:100%;display:block}
+a{color:var(--accent);text-underline-offset:3px}
+a:focus-visible,button:focus-visible{outline:2px solid var(--c-intent);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1160px;margin:0 auto;padding:0 28px}
+@media (max-width:600px){.wrap{padding:0 16px}}
+h1,h2,h3{font-family:var(--display);letter-spacing:-.02em}
+
+/* ---------- hero (dark band) ---------- */
+.hero{position:relative;background:var(--night);color:var(--night-ink);overflow:hidden;isolation:isolate}
+.aurora{position:absolute;inset:-20%;z-index:-1;filter:blur(70px);opacity:.55}
+.aurora i{position:absolute;border-radius:50%;width:46vw;height:46vw;max-width:640px;max-height:640px}
+.aurora i:nth-child(1){background:var(--c-intent);left:5%;top:10%;animation:drift1 22s ease-in-out infinite alternate}
+.aurora i:nth-child(2){background:var(--c-filter);right:8%;top:0;animation:drift2 26s ease-in-out infinite alternate}
+.aurora i:nth-child(3){background:var(--c-retrieval);left:40%;bottom:-5%;opacity:.7;animation:drift3 30s ease-in-out infinite alternate}
+@keyframes drift1{to{transform:translate(12vw,8vh) scale(1.1)}}
+@keyframes drift2{to{transform:translate(-10vw,14vh) scale(.9)}}
+@keyframes drift3{to{transform:translate(-14vw,-8vh) scale(1.15)}}
+.hero::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(12,15,46,.35),rgba(12,15,46,.85) 85%)}
+
+nav{display:flex;justify-content:space-between;align-items:center;padding:22px 0;gap:16px}
+nav .me{white-space:nowrap;font-family:var(--display);font-weight:700;font-size:18px;color:#fff;text-decoration:none;display:flex;align-items:center;gap:10px}
+.mark{width:30px;height:30px;border-radius:9px;background:conic-gradient(from 200deg,var(--c-intent),var(--c-filter),var(--c-guard),var(--c-answer),var(--c-retrieval),var(--c-intent));display:grid;place-items:center;font-size:13px;color:var(--night);font-weight:800}
+nav ul{display:flex;gap:24px;list-style:none;margin:0;padding:0;font-size:15px}
+nav ul a{color:var(--night-muted);text-decoration:none}
+nav ul a:hover{color:#fff}
+@media (max-width:640px){nav ul{gap:14px;font-size:14px} nav ul li.opt{display:none}}
+
+.hero-grid{display:grid;grid-template-columns:1fr 1.05fr;gap:40px;align-items:center;padding:44px 0 40px}
+@media (max-width:960px){.hero-grid{grid-template-columns:1fr;padding-top:20px}}
+.status{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--night-ink);background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);padding:6px 12px;border-radius:999px;margin-bottom:22px}
+.status b{width:8px;height:8px;border-radius:50%;background:var(--c-retrieval);box-shadow:0 0 0 0 rgba(45,212,191,.6);animation:ping 2.4s infinite}
+@keyframes ping{70%{box-shadow:0 0 0 9px rgba(45,212,191,0)}100%{box-shadow:0 0 0 0 rgba(45,212,191,0)}}
+h1{font-size:clamp(42px,6.4vw,76px);line-height:.98;margin:0 0 22px;font-weight:800}
+h1 .grad{background:linear-gradient(90deg,var(--c-intent),var(--c-filter) 30%,var(--c-guard) 55%,var(--c-answer) 78%,var(--c-retrieval));-webkit-background-clip:text;background-clip:text;color:transparent;background-size:200% 100%;animation:sheen 9s linear infinite}
+@keyframes sheen{to{background-position:-200% 0}}
+.lede{font-size:19px;color:var(--night-muted);max-width:32em;margin:0 0 28px}
+.lede strong{color:#fff;font-weight:600}
+.actions{display:flex;flex-wrap:wrap;gap:10px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 18px;border-radius:12px;font-weight:600;font-size:15px;text-decoration:none;border:1px solid var(--line);color:var(--ink);background:var(--surface);transition:transform .15s ease}
+.btn:hover{transform:translateY(-1px)}
+.hero .btn{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.2);color:#fff}
+.hero .btn.primary,.btn.primary{background:linear-gradient(135deg,var(--c-intent),var(--c-filter));border:0;color:#fff;box-shadow:0 10px 30px -10px rgba(108,140,255,.8)}
+
+/* stage: monitor + phone */
+.stage{position:relative;min-height:470px}
+@media (max-width:960px){.stage{min-height:0;padding-bottom:40px}}
+.window{background:#0A0C1C;border-radius:14px;border:1px solid rgba(255,255,255,.14);box-shadow:0 40px 80px -30px rgba(0,0,0,.7);overflow:hidden}
+.window .bar{display:flex;align-items:center;gap:6px;padding:9px 12px;background:#15183A;border-bottom:1px solid rgba(255,255,255,.08);font:12px "JetBrains Mono",monospace;color:var(--night-muted)}
+.window .bar i{width:10px;height:10px;border-radius:50%;background:#3A3F70}
+.window .bar i:nth-child(1){background:var(--c-guard)}.window .bar i:nth-child(2){background:var(--c-answer)}.window .bar i:nth-child(3){background:var(--c-retrieval)}
+.window .bar span{margin-left:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.monitor{width:88%;margin-left:auto}
+.monitor .view{height:360px;overflow:hidden;position:relative}
+.monitor .view img{width:100%;animation:pan 16s ease-in-out infinite alternate}
+@keyframes pan{0%,12%{transform:translateY(0)}88%,100%{transform:translateY(calc(-100% + 360px))}}
+@media (max-width:600px){.monitor{width:100%}.monitor .view{height:220px}@keyframes pan{0%,12%{transform:translateY(0)}88%,100%{transform:translateY(calc(-100% + 220px))}}}
+
+.phone{position:absolute;left:0;bottom:-6px;width:216px;border-radius:30px;padding:8px;background:#05061A;border:1px solid rgba(255,255,255,.18);box-shadow:0 30px 60px -20px rgba(0,0,0,.8),0 0 0 6px rgba(108,140,255,.12)}
+.phone .screen{position:relative;border-radius:23px;overflow:hidden;aspect-ratio:390/700;background:#fff}
+.phone .screen img{position:absolute;inset:0;width:100%;height:auto;opacity:0;transition:opacity .7s ease}
+.phone .screen img.on{opacity:1}
+.phone .notch{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:70px;height:18px;border-radius:0 0 12px 12px;background:#05061A;z-index:2}
+@media (max-width:960px){.phone{left:auto;right:4%;bottom:0;width:170px}}
+@media (max-width:600px){.phone{width:132px;border-radius:22px;padding:6px}.phone .screen{border-radius:17px}.phone .notch{display:none}}
+
+.caption{position:absolute;left:230px;bottom:18px;max-width:260px;background:rgba(20,24,66,.92);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:12px 14px;font-size:14px;line-height:1.45}
+.caption .who{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--night-muted);margin-bottom:4px}
+.caption .who b{width:8px;height:8px;border-radius:50%;background:var(--dot,var(--c-intent));transition:background .4s}
+.caption p{margin:0;transition:opacity .35s}
+.dots{display:flex;gap:5px;margin-top:10px}
+.dots i{height:4px;flex:1;border-radius:2px;background:rgba(255,255,255,.15);overflow:hidden}
+.dots i.on::after{content:"";display:block;height:100%;background:var(--dot,var(--c-intent));animation:fill var(--dur,4.2s) linear forwards}
+.dots i.done{background:rgba(255,255,255,.55)}
+@keyframes fill{from{width:0}to{width:100%}}
+@media (max-width:960px){.caption{left:0;bottom:12px;max-width:min(300px,55%)}}
+@media (max-width:600px){.caption{position:relative;left:auto;bottom:auto;max-width:none;margin-top:14px;margin-right:150px}}
+
+/* stats strip */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.1);border-radius:16px;overflow:hidden;margin:16px 0 56px}
+.stats div{background:rgba(12,15,46,.72);padding:18px 20px}
+.stats b{display:block;font-family:var(--display);font-size:30px;font-weight:700;line-height:1.1;color:#fff}
+.stats span{font-size:14px;color:var(--night-muted)}
+.stats div:nth-child(1) b{color:var(--c-retrieval)}.stats div:nth-child(2) b{color:var(--c-answer)}.stats div:nth-child(3) b{color:var(--c-guard)}.stats div:nth-child(4) b{color:var(--c-intent)}
+@media (max-width:760px){.stats{grid-template-columns:repeat(2,1fr)}}
+
+/* ---------- sections ---------- */
+section{padding:84px 0 0}
+h2{font-size:clamp(30px,4vw,44px);line-height:1.05;margin:0 0 12px;font-weight:700}
+.sub{color:var(--muted);margin:0 0 36px;max-width:38em;font-size:17px}
+h3{font-size:24px;margin:0;font-weight:700}
+
+/* pipeline */
+.pipe{position:relative;display:grid;grid-template-columns:repeat(6,1fr);gap:14px;padding:44px 0 8px}
+.track{position:absolute;left:4%;right:4%;top:18px;height:3px;border-radius:2px;background:linear-gradient(90deg,var(--c-intent),var(--c-filter),var(--c-retrieval),var(--c-answer),var(--c-guard),var(--c-retrieval));opacity:.35}
+.packet{position:absolute;top:10px;left:0;width:19px;height:19px;border-radius:50%;background:#fff;border:4px solid var(--pc,var(--c-intent));box-shadow:0 0 0 6px color-mix(in srgb,var(--pc,var(--c-intent)) 25%,transparent),0 0 24px var(--pc,var(--c-intent));transition:left .6s cubic-bezier(.6,0,.3,1),top .6s cubic-bezier(.6,0,.3,1),border-color .4s;z-index:2}
+.node{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 14px 14px;transition:transform .35s ease,box-shadow .35s ease,border-color .35s}
+.node .ic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--nc) 16%,var(--surface));color:var(--nc);margin:0 auto 12px;font-size:20px}
+.node h4{margin:0;font-family:var(--display);font-size:16px;text-align:center}
+.node .ms{display:block;text-align:center;font:500 13px "JetBrains Mono",monospace;color:var(--nc);margin:2px 0 8px}
+.node p{margin:0;font-size:13.5px;color:var(--muted);text-align:center;line-height:1.45}
+.node.on{border-color:var(--nc);transform:translateY(-4px);box-shadow:0 18px 40px -18px var(--nc)}
+.n-in{--nc:var(--c-intent)}.n-fi{--nc:var(--c-filter)}.n-re{--nc:var(--c-retrieval)}.n-an{--nc:var(--c-answer)}.n-gu{--nc:var(--c-guard)}.n-out{--nc:var(--c-retrieval)}
+@media (max-width:960px){
+  .pipe{grid-template-columns:1fr;gap:10px;padding:8px 0 8px 44px}
+  .track{left:17px;right:auto;top:20px;bottom:20px;width:3px;height:auto;background:linear-gradient(180deg,var(--c-intent),var(--c-filter),var(--c-retrieval),var(--c-answer),var(--c-guard),var(--c-retrieval))}
+  .packet{left:9px}
+  .node{display:grid;grid-template-columns:44px 1fr auto;gap:2px 12px;align-items:center;text-align:left;padding:12px 14px}
+  .node .ic{margin:0;grid-row:span 2}
+  .node h4,.node p{text-align:left}
+  .node .ms{margin:0;text-align:right}
+  .node p{grid-column:2/4}
+  .node.on{transform:translateX(4px)}
+}
+
+/* project */
+.project{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:36px;margin-bottom:28px;position:relative;overflow:hidden}
+.project::before{content:"";position:absolute;inset:0 0 auto 0;height:5px;background:linear-gradient(90deg,var(--c-intent),var(--c-filter),var(--c-retrieval),var(--c-answer),var(--c-guard))}
+@media (max-width:600px){.project{padding:24px 18px}}
+.phead{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 24px;align-items:baseline;margin-bottom:6px}
+.ptag{color:var(--muted);font-size:15px}
+.stack{display:flex;flex-wrap:wrap;gap:7px;margin:16px 0 26px;padding:0;list-style:none}
+.stack li{font-size:13px;padding:4px 11px;border-radius:999px;font-weight:600;background:color-mix(in srgb,var(--sc) 14%,var(--surface));color:color-mix(in srgb,var(--sc) 75%,var(--ink))}
+.stack li:nth-child(5n+1){--sc:var(--c-intent)}.stack li:nth-child(5n+2){--sc:var(--c-filter)}.stack li:nth-child(5n+3){--sc:var(--c-retrieval)}.stack li:nth-child(5n+4){--sc:var(--c-answer)}.stack li:nth-child(5n+5){--sc:var(--c-guard)}
+.cols{display:grid;grid-template-columns:1.05fr .95fr;gap:40px}
+@media (max-width:960px){.cols{grid-template-columns:1fr;gap:28px}}
+.points{margin:0;padding:0;list-style:none}
+.points li{position:relative;padding-left:22px;margin-bottom:12px}
+.points li::before{content:"";position:absolute;left:0;top:.6em;width:9px;height:9px;border-radius:3px;background:var(--pc)}
+.points li:nth-child(1){--pc:var(--c-intent)}.points li:nth-child(2){--pc:var(--c-retrieval)}.points li:nth-child(3){--pc:var(--c-guard)}.points li:nth-child(4){--pc:var(--c-answer)}.points li:nth-child(5){--pc:var(--c-filter)}
+
+.meter h4{margin:0 0 4px;font-family:var(--display);font-size:18px}
+.meter .legend{display:flex;gap:16px;font-size:13px;color:var(--muted);margin-bottom:14px}
+.meter .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.mrow{display:grid;grid-template-columns:150px 1fr 64px;gap:6px 12px;align-items:center;margin-bottom:12px;font-size:14.5px}
+.mrow .bars{display:grid;gap:4px}
+.mrow .b{height:9px;border-radius:5px;background:var(--line);overflow:hidden}
+.mrow .b i{display:block;height:100%;width:0;border-radius:5px;transition:width 1.1s cubic-bezier(.2,.7,.2,1)}
+.mrow .b.dev i{background:color-mix(in srgb,var(--accent) 45%,var(--surface))}
+.mrow .b.test i{background:linear-gradient(90deg,var(--c-intent),var(--c-retrieval))}
+.mrow.weak .b.test i{background:linear-gradient(90deg,var(--c-answer),var(--c-guard))}
+.mrow .v{font:500 13px "JetBrains Mono",monospace;text-align:right;line-height:1.35}
+.mrow .v small{display:block;color:var(--muted)}
+.mrow.weak .v{color:var(--warn)}
+.in .mrow .b i{width:var(--w)}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+.kpis div{border-radius:14px;padding:12px 14px;background:var(--accent-tint)}
+.kpis b{font-family:var(--display);font-size:24px;display:block;line-height:1.1}
+.kpis span{font-size:13px;color:var(--muted)}
+@media (max-width:600px){.mrow{grid-template-columns:1fr 64px}.mrow .bars{grid-column:1/-1;order:3}}
+.note{font-size:14px;color:var(--muted);margin-top:12px}
+.lesson{background:var(--warn-tint);border-radius:14px;padding:14px 16px;margin-top:16px;font-size:15px;border-left:4px solid var(--c-answer)}
+.lesson b{color:var(--warn)}
+
+/* screenshots */
+.shots{display:grid;grid-template-columns:1.25fr 1fr;gap:18px;margin-top:34px}
+@media (max-width:860px){.shots{grid-template-columns:1fr}}
+.shots .window{background:var(--surface);border-color:var(--line);box-shadow:0 24px 50px -30px rgba(18,20,43,.45)}
+.shots .window .bar{background:color-mix(in srgb,var(--ink) 6%,var(--surface));border-color:var(--line);color:var(--muted)}
+.scroller{height:380px;overflow:hidden}
+.scroller img{width:100%;animation:pan2 18s ease-in-out infinite alternate}
+.scroller:hover img{animation-play-state:paused}
+@keyframes pan2{0%,10%{transform:translateY(0)}90%,100%{transform:translateY(calc(-100% + 380px))}}
+.stackshots{display:grid;gap:18px}
+.stackshots a{display:block}
+.stackshots img{aspect-ratio:16/9;object-fit:cover;object-position:top left;width:100%}
+figure{margin:0}
+figcaption{font-size:13.5px;color:var(--muted);margin-top:8px}
+.links{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.links a{font-weight:600;font-size:15px;text-decoration:none;padding:9px 14px;border-radius:10px;background:var(--accent-tint)}
+
+/* devprep illustration */
+.room{background:var(--night);border-radius:20px;padding:18px;color:var(--night-ink);position:relative;overflow:hidden}
+.room .cam{position:relative;aspect-ratio:4/3;border-radius:14px;background:radial-gradient(circle at 50% 40%,#2A3170,#11143A 70%);overflow:hidden}
+.room .face{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);width:34%;aspect-ratio:3/4}
+.room .face svg{width:100%;height:100%}
+.room .box{position:absolute;inset:-12%;border:2px solid transparent}
+.room .box::before,.room .box::after{content:"";position:absolute;width:22px;height:22px;border:3px solid var(--c-retrieval)}
+.room .box::before{left:0;top:0;border-right:0;border-bottom:0;border-radius:6px 0 0 0}
+.room .box::after{right:0;bottom:0;border-left:0;border-top:0;border-radius:0 0 6px 0}
+.room .scan{position:absolute;left:8%;right:8%;height:2px;background:linear-gradient(90deg,transparent,var(--c-retrieval),transparent);box-shadow:0 0 14px var(--c-retrieval);animation:scan 3.2s ease-in-out infinite}
+@keyframes scan{0%{top:14%}50%{top:82%}100%{top:14%}}
+.room .chip{position:absolute;font-size:12px;padding:5px 10px;border-radius:999px;background:rgba(12,15,46,.8);border:1px solid rgba(255,255,255,.16);display:flex;gap:6px;align-items:center}
+.room .chip b{width:7px;height:7px;border-radius:50%;background:var(--c-retrieval)}
+.room .c1{left:10px;top:10px}.room .c2{right:10px;top:10px}.room .c2 b{background:var(--c-guard);animation:blink 1.4s infinite}
+@keyframes blink{50%{opacity:.2}}
+.room .q{margin:14px 2px 10px;font-size:14px;color:var(--night-muted)}
+.room .q b{color:#fff;font-weight:600}
+.wave{display:flex;align-items:center;gap:3px;height:36px}
+.wave i{flex:1;border-radius:3px;background:linear-gradient(180deg,var(--c-intent),var(--c-filter));height:20%;animation:wv 1.1s ease-in-out infinite alternate}
+@keyframes wv{to{height:100%}}
+.room .score{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.room .score span{font-size:12px;padding:5px 10px;border-radius:8px;background:rgba(255,255,255,.07)}
+.room .score span b{color:var(--c-answer)}
+.illo{font-size:12.5px;color:var(--muted);margin-top:8px}
+
+/* principles */
+.principles{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media (max-width:880px){.principles{grid-template-columns:1fr}}
+.principles div{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:24px;position:relative;overflow:hidden}
+.principles div::after{content:"";position:absolute;right:-30px;top:-30px;width:110px;height:110px;border-radius:50%;background:var(--pc);opacity:.16}
+.principles div:nth-child(1){--pc:var(--c-retrieval)}.principles div:nth-child(2){--pc:var(--c-guard)}.principles div:nth-child(3){--pc:var(--c-intent)}
+.principles h3{font-size:21px}
+.principles h3::before{content:"";display:block;width:34px;height:5px;border-radius:3px;background:var(--pc);margin-bottom:14px}
+.principles p{color:var(--muted);margin:8px 0 0;font-size:15px}
+
+/* timeline */
+.timeline{position:relative;padding-left:28px}
+.timeline::before{content:"";position:absolute;left:7px;top:8px;bottom:8px;width:2px;background:linear-gradient(180deg,var(--c-intent),var(--c-filter),var(--c-answer),var(--c-retrieval))}
+.tl{position:relative;padding:4px 0 26px;display:grid;grid-template-columns:150px 1fr;gap:4px 28px}
+.tl::before{content:"";position:absolute;left:-27px;top:9px;width:14px;height:14px;border-radius:50%;background:var(--surface);border:3px solid var(--tc)}
+.tl:nth-child(1){--tc:var(--c-intent)}.tl:nth-child(2){--tc:var(--c-filter)}.tl:nth-child(3){--tc:var(--c-answer)}.tl:nth-child(4){--tc:var(--c-retrieval)}
+.tl .when{color:var(--muted);font-size:15px;font-variant-numeric:tabular-nums}
+.tl p{margin:3px 0 0;color:var(--muted);font-size:15px}
+.badge{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;background:color-mix(in srgb,var(--tc) 18%,var(--surface));color:color-mix(in srgb,var(--tc) 70%,var(--ink));margin-left:6px;vertical-align:2px}
+@media (max-width:600px){.tl{grid-template-columns:1fr}}
+
+/* skills */
+.skills{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media (max-width:960px){.skills{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){.skills{grid-template-columns:1fr}}
+.skills div{border-radius:18px;padding:20px;background:color-mix(in srgb,var(--kc) 10%,var(--surface));border:1px solid color-mix(in srgb,var(--kc) 30%,var(--line))}
+.skills div:nth-child(1){--kc:var(--c-intent)}.skills div:nth-child(2){--kc:var(--c-retrieval)}.skills div:nth-child(3){--kc:var(--c-answer)}.skills div:nth-child(4){--kc:var(--c-filter)}
+.skills h3{font-size:17px;margin-bottom:10px}
+.skills ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.skills li{font-size:13.5px;padding:3px 9px;border-radius:8px;background:var(--surface);border:1px solid var(--line)}
+
+/* footer */
+footer{margin-top:96px;background:var(--night);color:var(--night-ink);position:relative;overflow:hidden}
+footer .wrap{padding-top:64px;padding-bottom:56px}
+footer h2{color:#fff}
+footer .sub{color:var(--night-muted)}
+footer .btn{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.2);color:#fff}
+footer .small{margin-top:40px;font-size:13px;color:var(--night-muted)}
+footer::before{content:"";position:absolute;right:-120px;bottom:-160px;width:420px;height:420px;border-radius:50%;background:conic-gradient(var(--c-intent),var(--c-filter),var(--c-guard),var(--c-answer),var(--c-retrieval),var(--c-intent));filter:blur(80px);opacity:.35}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .mrow .b i{width:var(--w)}
+  .packet{display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="wrap">
+    <nav aria-label="Main">
+      <a class="me" href="#top"><span class="mark" aria-hidden="true">D</span>Tran Quang Duyen</a>
+      <ul>
+        <li><a href="#work">Work</a></li>
+        <li class="opt"><a href="#how">How I work</a></li>
+        <li class="opt"><a href="#experience">Experience</a></li>
+        <li><a href="cv.pdf">CV</a></li>
+      </ul>
+    </nav>
+
+    <div class="hero-grid" id="top">
+      <div>
+        <span class="status"><b aria-hidden="true"></b>Open to AI engineer roles · Vietnam or remote</span>
+        <h1>I build LLM features <span class="grad">you can measure.</span></h1>
+        <p class="lede">AI engineer, FPT University IT graduate. My latest project, <strong>ShopMate</strong>, is a RAG + agent sales assistant for a Vietnamese fashion store, evaluated on a test set locked before its only run, and traced step by step in its own monitor.</p>
+        <div class="actions">
+          <a class="btn primary" href="#work">See the work</a>
+          <a class="btn" href="https://github.com/duyentq-aie" rel="noopener">GitHub</a>
+          <a class="btn" href="cv.pdf">Download CV</a>
+        </div>
+      </div>
+
+      <div class="stage" aria-label="ShopMate in action: the chat widget on a phone and the operator monitor behind it">
+        <div class="window monitor">
+          <div class="bar"><i></i><i></i><i></i><span>ShopMate monitor · request journey</span></div>
+          <div class="view"><img src="assets/monitor-flow.webp" alt="ShopMate monitor showing each step of one request with its latency and cost" width="1200" height="750"></div>
+        </div>
+        <div class="phone">
+          <span class="notch" aria-hidden="true"></span>
+          <div class="screen">
+            <img class="on" src="assets/phone-1.webp" alt="Chat widget greeting with suggested questions">
+            <img src="assets/phone-2.webp" alt="Widget showing two matching brown dress shoes with price and stock" loading="lazy">
+            <img src="assets/phone-3.webp" alt="Widget explaining which filter blocked the search and offering to relax it" loading="lazy">
+            <img src="assets/phone-4.webp" alt="Widget asking for confirmation before creating a support ticket" loading="lazy">
+          </div>
+        </div>
+        <div class="caption" aria-live="polite">
+          <div class="who"><b></b><span id="cap-k">Greeting</span></div>
+          <p id="cap-t">Suggested questions get a shopper started.</p>
+          <div class="dots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div><b>31 / 33</b><span>correct on the locked test set</span></div>
+      <div><b>2.6 s</b><span>median reply time</span></div>
+      <div><b>$0.91</b><span>per 1,000 conversations</span></div>
+      <div><b>1,600+</b><span>offline tests run in CI</span></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+<section id="how-it-works" aria-labelledby="pipe-h">
+  <h2 id="pipe-h">One question, five steps</h2>
+  <p class="sub">A real request from ShopMate's monitor: "Có áo khoác nam màu đen không shop?" (any black men's jackets?). Each step has a colour, and that colour means the same thing everywhere on this page.</p>
+  <div class="pipe" id="pipe">
+    <span class="track" aria-hidden="true"></span>
+    <span class="packet" aria-hidden="true"></span>
+    <div class="node n-in"><span class="ic" aria-hidden="true">⇢</span><h4>Intent routing</h4><span class="ms">924 ms</span><p>Product search, not policy or order status.</p></div>
+    <div class="node n-fi"><span class="ic" aria-hidden="true">⚑</span><h4>Filter extraction</h4><span class="ms">1,010 ms</span><p>Type: men's jacket. Colour: black.</p></div>
+    <div class="node n-re"><span class="ic" aria-hidden="true">◎</span><h4>Hybrid retrieval</h4><span class="ms">266 ms</span><p>bge-m3 vectors + accent-folded BM25 in Qdrant.</p></div>
+    <div class="node n-an"><span class="ic" aria-hidden="true">✎</span><h4>Answer</h4><span class="ms">1,590 ms</span><p>Written only from the products found.</p></div>
+    <div class="node n-gu"><span class="ic" aria-hidden="true">⛨</span><h4>Guardrail</h4><span class="ms">in code</span><p>Every quoted price must match its SKU.</p></div>
+    <div class="node n-out"><span class="ic" aria-hidden="true">✓</span><h4>Reply</h4><span class="ms">3.79 s total</span><p>Two jackets in stock, with prices.</p></div>
+  </div>
+</section>
+
+<section id="work" aria-labelledby="work-h">
+  <h2 id="work-h">Selected work</h2>
+  <p class="sub">Two systems, built end to end. Every number links back to a committed result file.</p>
+
+  <article class="project" aria-labelledby="sm-h">
+    <div class="phead"><h3 id="sm-h">ShopMate — AI sales assistant for an online fashion store</h3><span class="ptag">Personal project, 2026</span></div>
+    <ul class="stack" aria-label="Stack">
+      <li>Python</li><li>LangGraph</li><li>Qdrant</li><li>Gemini</li><li>Guardrails</li><li>bge-m3</li><li>Saleor GraphQL</li><li>FastAPI</li><li>GitHub Actions</li><li>Web Components</li>
+    </ul>
+    <div class="cols">
+      <ul class="points">
+        <li>An agent that answers product, return-policy and order-status questions over a Saleor store with 250 products. Read-only tools, at most 8 steps, and support tickets only after the customer confirms.</li>
+        <li>Hybrid search for Vietnamese typed without accents: fusing an accent-folded keyword index with bge-m3 vectors raised MRR by <b>+0.43</b> (95% CI 0.27–0.58) over the baseline.</li>
+        <li>A guardrail in code, not in the prompt: any sentence that quotes a price must match the SKU it names, or the answer is replaced.</li>
+        <li>Evaluated like an experiment: 104-question golden set, dev/test split, test locked by hash and pre-registered before its single run. CI runs 1,600+ offline tests, result-integrity checks and secret scanning.</li>
+        <li>An embeddable chat widget, and an operator monitor that shows every request from question to reply.</li>
+      </ul>
+
+      <div class="meter" id="meter">
+        <h4>Dev set vs. locked test</h4>
+        <div class="legend"><span><i style="background:color-mix(in srgb,var(--accent) 45%,var(--surface))"></i>Dev (71 questions)</span><span><i style="background:linear-gradient(90deg,var(--c-intent),var(--c-retrieval))"></i>Test (33, run once)</span></div>
+        <div class="mrow"><span>Correct answers</span><span class="bars"><span class="b dev"><i style="--w:98.6%"></i></span><span class="b test"><i style="--w:93.9%"></i></span></span><span class="v">70/71<small>31/33</small></span></div>
+        <div class="mrow"><span>Intent routing</span><span class="bars"><span class="b dev"><i style="--w:100%"></i></span><span class="b test"><i style="--w:100%"></i></span></span><span class="v">71/71<small>33/33</small></span></div>
+        <div class="mrow"><span>Retrieval MRR</span><span class="bars"><span class="b dev"><i style="--w:100%"></i></span><span class="b test"><i style="--w:100%"></i></span></span><span class="v">1.00<small>1.00</small></span></div>
+        <div class="mrow weak"><span>Filter extraction</span><span class="bars"><span class="b dev"><i style="--w:95.8%"></i></span><span class="b test"><i style="--w:60%"></i></span></span><span class="v">23/24<small>6/10</small></span></div>
+        <div class="kpis">
+          <div><b>2.6 s</b><span>median latency, test</span></div>
+          <div><b>$0.91</b><span>per 1,000 chats, test</span></div>
+        </div>
+        <p class="note">Small samples, so intervals are wide; the full report has confidence intervals.</p>
+        <div class="lesson"><b>What the test taught me.</b> Filter extraction dropped from 23/24 to 6/10: the prompt fit the dev questions too closely. Both wrong answers came from the guardrail firing on a correct reply, so a stricter guardrail is not free. Next: a second golden set and a looser price check.</div>
+      </div>
+    </div>
+
+    <div class="shots">
+      <figure>
+        <div class="window">
+          <div class="bar"><i></i><i></i><i></i><span>shopmate-fashion · demo store</span></div>
+          <div class="scroller"><img src="assets/demo-store.webp" alt="ShopMate demo store page with product photos and the chat widget button" loading="lazy" width="1000" height="1597"></div>
+        </div>
+        <figcaption>Demo store with licensed product photos and the embeddable widget. Hover to pause.</figcaption>
+      </figure>
+      <div class="stackshots">
+        <figure><a href="assets/monitor-journey.webp"><div class="window"><div class="bar"><i></i><i></i><i></i><span>monitor · journey</span></div><img src="assets/monitor-journey.webp" alt="Monitor view of one conversation turn with timings per step" loading="lazy"></div></a><figcaption>One request, step by step, with latency and cost.</figcaption></figure>
+        <figure><a href="assets/architecture.webp"><div class="window"><div class="bar"><i></i><i></i><i></i><span>architecture</span></div><img src="assets/architecture.webp" alt="ShopMate architecture diagram" loading="lazy"></div></a><figcaption>Architecture. Click to open full size.</figcaption></figure>
+      </div>
+    </div>
+
+    <div class="links">
+      <a href="https://github.com/duyentq-aie/shopmate" rel="noopener">Source code</a>
+      <a href="https://github.com/duyentq-aie/shopmate/blob/main/docs/RESULTS-final.md" rel="noopener">Final results report</a>
+      <a href="https://github.com/duyentq-aie/shopmate/blob/main/docs/PHASE8-PREREG.md" rel="noopener">Pre-registration</a>
+    </div>
+  </article>
+
+  <article class="project" aria-labelledby="dp-h">
+    <div class="phead"><h3 id="dp-h">DevPrep — AI mock-interview platform</h3><span class="ptag">Capstone, team project, FPT University, 2026</span></div>
+    <ul class="stack" aria-label="Stack">
+      <li>.NET 8 microservices</li><li>YARP</li><li>ChromaDB</li><li>Gemini</li><li>InsightFace</li><li>FastAPI</li><li>SpeechBrain</li><li>Deepgram</li><li>Docker</li>
+    </ul>
+    <div class="cols">
+      <ul class="points">
+        <li>I owned the interview, grading and web-client services and co-owned the Python AI service, in a system of 10+ microservices behind a YARP gateway.</li>
+        <li>Answer grading with Gemini against reference answers retrieved from ChromaDB, on a 50/30/20 rubric, with background grading, a duplicate-grading guard and IDOR protection on reports.</li>
+        <li>Biometric anti-cheating: face (ArcFace) and voice (ECAPA-TDNN) enrollment, a verification gate before each session and periodic face checks during the interview.</li>
+        <li>A voice interview room (Deepgram speech-to-text, text-to-speech playback), with credit charging made race-free by one atomic conditional UPDATE.</li>
+        <li>The repository belongs to the team and is private. I'm happy to walk through the architecture and my services in an interview.</li>
+      </ul>
+      <div>
+        <div class="room" aria-label="Illustration of the DevPrep interview room">
+          <div class="cam">
+            <span class="chip c1"><b></b>Face verified</span>
+            <span class="chip c2"><b></b>Recording</span>
+            <div class="face"><span class="box"></span>
+              <svg viewBox="0 0 60 80" aria-hidden="true"><circle cx="30" cy="26" r="17" fill="#3B4390"/><path d="M4 80c2-20 12-30 26-30s24 10 26 30z" fill="#3B4390"/></svg>
+            </div>
+            <span class="scan"></span>
+          </div>
+          <p class="q">Question 3 of 8 · <b>How would you prevent double charging when two requests arrive at once?</b></p>
+          <div class="wave" aria-hidden="true"></div>
+          <div class="score"><span>Correctness <b>50%</b></span><span>Depth <b>30%</b></span><span>Clarity <b>20%</b></span></div>
+        </div>
+        <p class="illo">Illustration of the interview room, not a screenshot.</p>
+      </div>
+    </div>
+  </article>
+</section>
+
+<section id="how" aria-labelledby="how-h">
+  <h2 id="how-h">How I work</h2>
+  <p class="sub">The habits behind the numbers above.</p>
+  <div class="principles">
+    <div><h3>Measure before trusting</h3><p>Golden sets, a dev/test split, confidence intervals, and a test set that is run once. A weak result is reported, not re-run.</p></div>
+    <div><h3>Guard in code</h3><p>Limits an LLM cannot talk its way around: step caps, read-only tools, confirmation before any action, checks on every price.</p></div>
+    <div><h3>See every request</h3><p>Each request is traced from intent to reply, with latency and cost per step, so failures have an address.</p></div>
+  </div>
+</section>
+
+<section id="experience" aria-labelledby="exp-h">
+  <h2 id="exp-h">Experience &amp; education</h2>
+  <p class="sub">Most recent first.</p>
+  <div class="timeline">
+    <div class="tl"><span class="when">07 – 08/2026</span><div><b><a href="https://drive.google.com/file/d/1p0uDmfEFyisFn_aFWG9eFomb95khUob2/view?usp=sharing" rel="noopener">Practical AI Training Program</a></b><span class="badge">Certificate</span><p>FPT University Can Tho, certificate of completion.</p></div></div>
+    <div class="tl"><span class="when">2026</span><div><b><a href="https://drive.google.com/file/d/1AAuc7Xr40qpqdpBrdw5aL12f2lQfinnJ/view?usp=sharing" rel="noopener">Top 15, FPTU Can Tho Olympic AI 2026</a></b><span class="badge">Award</span><p>Theme: "AI for Smart Mekong Delta".</p></div></div>
+    <div class="tl"><span class="when">2022 – 2026</span><div><b>Information Technology, FPT University</b><p>Capstone: DevPrep, AI mock-interview platform.</p></div></div>
+    <div class="tl"><span class="when">10/2024 – 02/2025</span><div><b>Backend Developer Intern, Biwoco Co., Ltd.</b><p>Built and maintained FastAPI REST APIs for products in the Australian market, with MongoDB, AWS and microservices. Worked with overseas partners in English-language meetings.</p></div></div>
+  </div>
+</section>
+
+<section aria-labelledby="skills-h">
+  <h2 id="skills-h">Skills</h2>
+  <p class="sub">What I reach for, grouped by the job it does.</p>
+  <div class="skills">
+    <div><h3>LLM &amp; agents</h3><ul><li>Gemini API</li><li>LangGraph</li><li>LangChain</li><li>RAG</li><li>Prompt engineering</li><li>Guardrails</li><li>vLLM</li><li>Fine-tuning</li></ul></div>
+    <div><h3>Retrieval</h3><ul><li>Qdrant</li><li>ChromaDB</li><li>bge-m3</li><li>BM25</li><li>Reciprocal rank fusion</li></ul></div>
+    <div><h3>Evaluation &amp; tracing</h3><ul><li>Golden sets</li><li>MRR / Recall@k</li><li>Bootstrap CIs</li><li>Wilson intervals</li><li>Langfuse</li><li>Latency &amp; cost</li></ul></div>
+    <div><h3>Backend &amp; DevOps</h3><ul><li>Python</li><li>FastAPI</li><li>.NET 8</li><li>GraphQL</li><li>MongoDB</li><li>PostgreSQL</li><li>SQL Server</li><li>Docker</li><li>GitHub Actions</li><li>AWS basics</li></ul></div>
+  </div>
+</section>
+
+</main>
+
+<footer id="contact">
+  <div class="wrap">
+    <h2>Let's talk</h2>
+    <p class="sub">Hiring for an AI engineer who measures before shipping? I reply within a day.</p>
+    <div class="actions">
+      <a class="btn primary" href="mailto:tranquangduyen2503@gmail.com">tranquangduyen2503@gmail.com</a>
+      <a class="btn" href="https://github.com/duyentq-aie" rel="noopener">GitHub</a>
+      <a class="btn" href="cv.pdf">CV (PDF)</a>
+    </div>
+    <p class="small">Vietnamese (native), English (technical reading, work meetings). Product photos in the demo store: Unsplash and Pexels licences, credited in the repo.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* waveform bars */
+  var wave = document.querySelector('.wave');
+  for (var w = 0; w < 36; w++){ var i = document.createElement('i'); i.style.animationDelay = (-(w*137)%1100)/1000 + 's'; i.style.animationDuration = (0.7 + (w*53%60)/100) + 's'; wave.appendChild(i); }
+
+  /* result bars grow when visible */
+  var meter = document.getElementById('meter');
+  if ('IntersectionObserver' in window && !reduce){
+    new IntersectionObserver(function(es, o){ es.forEach(function(e){ if (e.isIntersecting){ meter.classList.add('in'); o.disconnect(); } }); }, {threshold:.3}).observe(meter);
+  } else meter.classList.add('in');
+
+  if (reduce) return;
+
+  /* phone story */
+  var stages = [
+    {k:'Greeting', t:'Suggested questions get a shopper started.', c:'var(--c-intent)'},
+    {k:'Product search', t:'"Brown dress shoes under 1M": two matches, with price and stock.', c:'var(--c-retrieval)'},
+    {k:'No exact match', t:'It says which filter blocked the search and offers to relax it.', c:'var(--c-answer)'},
+    {k:'Confirm first', t:'A support ticket is created only after the customer says yes.', c:'var(--c-guard)'}
+  ];
+  var imgs = document.querySelectorAll('.phone .screen img');
+  var dots = document.querySelectorAll('.dots i');
+  var cap = document.querySelector('.caption');
+  var k = document.getElementById('cap-k'), t = document.getElementById('cap-t');
+  var s = 0, DUR = 4200;
+  function show(n){
+    imgs.forEach(function(im, j){ im.classList.toggle('on', j === n); });
+    dots.forEach(function(d, j){ d.classList.remove('on'); d.classList.toggle('done', j < n); });
+    void cap.offsetWidth; dots[n].classList.add('on');
+    cap.style.setProperty('--dot', stages[n].c);
+    k.textContent = stages[n].k; t.textContent = stages[n].t;
+  }
+  show(0);
+  setInterval(function(){ s = (s + 1) % stages.length; show(s); }, DUR);
+
+  /* pipeline packet */
+  var pipe = document.getElementById('pipe');
+  var nodes = pipe.querySelectorAll('.node');
+  var packet = pipe.querySelector('.packet');
+  var colors = ['--c-intent','--c-filter','--c-retrieval','--c-answer','--c-guard','--c-retrieval'];
+  var p = 0, running = false, timer;
+  function place(){
+    var n = nodes[p], vertical = getComputedStyle(pipe).gridTemplateColumns.split(' ').length === 1;
+    var pr = pipe.getBoundingClientRect(), nr = n.getBoundingClientRect();
+    if (vertical){ packet.style.left = '9px'; packet.style.top = (nr.top - pr.top + nr.height/2 - 10) + 'px'; }
+    else { packet.style.top = '10px'; packet.style.left = (nr.left - pr.left + nr.width/2 - 10) + 'px'; }
+    packet.style.setProperty('--pc', 'var(' + colors[p] + ')');
+    nodes.forEach(function(x, j){ x.classList.toggle('on', j === p); });
+  }
+  function tick(){ place(); p = (p + 1) % nodes.length; timer = setTimeout(tick, p === 0 ? 2200 : 1100); }
+  window.addEventListener('resize', place);
+  if ('IntersectionObserver' in window){
+    new IntersectionObserver(function(es){ es.forEach(function(e){
+      if (e.isIntersecting && !running){ running = true; tick(); }
+      else if (!e.isIntersecting && running){ running = false; clearTimeout(timer); }
+    }); }, {threshold:.2}).observe(pipe);
+  } else tick();
+})();
+</script>
+</body>
+</html>
