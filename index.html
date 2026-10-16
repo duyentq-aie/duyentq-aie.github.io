@@ -7,7 +7,7 @@
 <meta name="description" content="AI engineer building LLM applications that are measured before they ship: RAG, agents, evaluation and observability.">
 <meta property="og:title" content="Tran Quang Duyen — AI Engineer">
 <meta property="og:description" content="RAG + agent systems, evaluated on a locked test set and traced end to end.">
-<meta property="og:image" content="assets/monitor-flow.webp">
+<meta property="og:image" content="assets/monitor-journey.webp">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -86,13 +86,13 @@ h1 .grad{background:linear-gradient(90deg,var(--c-intent),var(--c-filter) 30%,va
 .window .bar span{margin-left:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .monitor{width:88%;margin-left:auto}
 .monitor .view{height:360px;overflow:hidden;position:relative}
-.monitor .view img{width:100%;animation:pan 16s ease-in-out infinite alternate}
+.monitor .view img{width:100%;height:auto;max-width:none;animation:pan 16s ease-in-out infinite alternate}
 @keyframes pan{0%,12%{transform:translateY(0)}88%,100%{transform:translateY(calc(-100% + 360px))}}
 @media (max-width:600px){.monitor{width:100%}.monitor .view{height:220px}@keyframes pan{0%,12%{transform:translateY(0)}88%,100%{transform:translateY(calc(-100% + 220px))}}}
 
 .phone{position:absolute;left:0;bottom:-6px;width:216px;border-radius:30px;padding:8px;background:#05061A;border:1px solid rgba(255,255,255,.18);box-shadow:0 30px 60px -20px rgba(0,0,0,.8),0 0 0 6px rgba(108,140,255,.12)}
 .phone .screen{position:relative;border-radius:23px;overflow:hidden;aspect-ratio:390/700;background:#fff}
-.phone .screen img{position:absolute;inset:0;width:100%;height:auto;opacity:0;transition:opacity .7s ease}
+.phone .screen img{position:absolute;top:0;left:0;width:100%;height:auto;max-width:none;opacity:0;transition:opacity .7s ease}
 .phone .screen img.on{opacity:1}
 .phone .notch{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:70px;height:18px;border-radius:0 0 12px 12px;background:#05061A;z-index:2}
 @media (max-width:960px){.phone{left:auto;right:4%;bottom:0;width:170px}}
@@ -192,12 +192,12 @@ h3{font-size:24px;margin:0;font-weight:700}
 .shots .window{background:var(--surface);border-color:var(--line);box-shadow:0 24px 50px -30px rgba(18,20,43,.45)}
 .shots .window .bar{background:color-mix(in srgb,var(--ink) 6%,var(--surface));border-color:var(--line);color:var(--muted)}
 .scroller{height:380px;overflow:hidden}
-.scroller img{width:100%;animation:pan2 18s ease-in-out infinite alternate}
+.scroller img{width:100%;height:auto;max-width:none;animation:pan2 18s ease-in-out infinite alternate}
 .scroller:hover img{animation-play-state:paused}
 @keyframes pan2{0%,10%{transform:translateY(0)}90%,100%{transform:translateY(calc(-100% + 380px))}}
 .stackshots{display:grid;gap:18px}
 .stackshots a{display:block}
-.stackshots img{aspect-ratio:16/9;object-fit:cover;object-position:top left;width:100%}
+.stackshots img{aspect-ratio:16/9;object-fit:cover;object-position:top left;width:100%;height:auto}
 figure{margin:0}
 figcaption{font-size:13.5px;color:var(--muted);margin-top:8px}
 .links{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
@@ -305,15 +305,15 @@ footer::before{content:"";position:absolute;right:-120px;bottom:-160px;width:420
       <div class="stage" aria-label="ShopMate in action: the chat widget on a phone and the operator monitor behind it">
         <div class="window monitor">
           <div class="bar"><i></i><i></i><i></i><span>ShopMate monitor · request journey</span></div>
-          <div class="view"><img src="assets/monitor-flow.webp" alt="ShopMate monitor showing each step of one request with its latency and cost" width="1200" height="750"></div>
+          <div class="view"><img src="assets/monitor-flow.webp" alt="ShopMate monitor showing each step of one request with its latency and cost" width="1528" height="2058"></div>
         </div>
         <div class="phone">
           <span class="notch" aria-hidden="true"></span>
           <div class="screen">
             <img class="on" src="assets/phone-1.webp" alt="Chat widget greeting with suggested questions">
-            <img src="assets/phone-2.webp" alt="Widget showing two matching brown dress shoes with price and stock" loading="lazy">
-            <img src="assets/phone-3.webp" alt="Widget explaining which filter blocked the search and offering to relax it" loading="lazy">
-            <img src="assets/phone-4.webp" alt="Widget asking for confirmation before creating a support ticket" loading="lazy">
+            <img src="assets/phone-2.webp" alt="Widget showing two matching brown dress shoes with price and stock">
+            <img src="assets/phone-3.webp" alt="Widget explaining which filter blocked the search and offering to relax it">
+            <img src="assets/phone-4.webp" alt="Widget asking for confirmation before creating a support ticket">
           </div>
         </div>
         <div class="caption" aria-live="polite">
@@ -388,13 +388,13 @@ footer::before{content:"";position:absolute;right:-120px;bottom:-160px;width:420
       <figure>
         <div class="window">
           <div class="bar"><i></i><i></i><i></i><span>shopmate-fashion · demo store</span></div>
-          <div class="scroller"><img src="assets/demo-store.webp" alt="ShopMate demo store page with product photos and the chat widget button" loading="lazy" width="1000" height="1597"></div>
+          <div class="scroller"><img src="assets/demo-store.webp" alt="ShopMate demo store page with product photos and the chat widget button" loading="lazy" width="1600" height="3131"></div>
         </div>
         <figcaption>Demo store with licensed product photos and the embeddable widget. Hover to pause.</figcaption>
       </figure>
       <div class="stackshots">
-        <figure><a href="assets/monitor-journey.webp"><div class="window"><div class="bar"><i></i><i></i><i></i><span>monitor · journey</span></div><img src="assets/monitor-journey.webp" alt="Monitor view of one conversation turn with timings per step" loading="lazy"></div></a><figcaption>One request, step by step, with latency and cost.</figcaption></figure>
-        <figure><a href="assets/architecture.webp"><div class="window"><div class="bar"><i></i><i></i><i></i><span>architecture</span></div><img src="assets/architecture.webp" alt="ShopMate architecture diagram" loading="lazy"></div></a><figcaption>Architecture. Click to open full size.</figcaption></figure>
+        <figure><a href="assets/monitor-journey.webp"><div class="window"><div class="bar"><i></i><i></i><i></i><span>monitor · request flow</span></div><img src="assets/monitor-journey.webp" alt="Monitor request list with one request opened step by step" loading="lazy" width="1800" height="1159"></div></a><figcaption>One request, step by step, with latency and cost.</figcaption></figure>
+        <figure><a href="assets/architecture.webp"><div class="window"><div class="bar"><i></i><i></i><i></i><span>architecture</span></div><img src="assets/architecture.webp" alt="ShopMate architecture diagram" loading="lazy" width="2200" height="1414"></div></a><figcaption>Architecture. Click to open full size.</figcaption></figure>
       </div>
     </div>
 
@@ -455,7 +455,7 @@ footer::before{content:"";position:absolute;right:-120px;bottom:-160px;width:420
     <div class="tl"><span class="when">07 – 08/2026</span><div><b><a href="https://drive.google.com/file/d/1p0uDmfEFyisFn_aFWG9eFomb95khUob2/view?usp=sharing" rel="noopener">Practical AI Training Program</a></b><span class="badge">Certificate</span><p>FPT University Can Tho, certificate of completion.</p></div></div>
     <div class="tl"><span class="when">2026</span><div><b><a href="https://drive.google.com/file/d/1AAuc7Xr40qpqdpBrdw5aL12f2lQfinnJ/view?usp=sharing" rel="noopener">Top 15, FPTU Can Tho Olympic AI 2026</a></b><span class="badge">Award</span><p>Theme: "AI for Smart Mekong Delta".</p></div></div>
     <div class="tl"><span class="when">2022 – 2026</span><div><b>Information Technology, FPT University</b><p>Capstone: DevPrep, AI mock-interview platform.</p></div></div>
-    <div class="tl"><span class="when">10/2024 – 02/2025</span><div><b>Backend Developer Intern, Biwoco Co., Ltd.</b><p>Built and maintained FastAPI REST APIs for products in the Australian market, with MongoDB, AWS and microservices. Worked with overseas partners in English-language meetings.</p></div></div>
+    <div class="tl"><span class="when">10/2024 – 02/2025</span><div><b>Backend Developer Intern, BIWOCO Software Company Limited</b><p>Built and maintained asynchronous FastAPI REST APIs with MongoDB for a microservice backend on AWS, for a product in the Australian market. Attended English-language stand-ups and sprint reviews with the client team.</p></div></div>
   </div>
 </section>
 
@@ -463,7 +463,7 @@ footer::before{content:"";position:absolute;right:-120px;bottom:-160px;width:420
   <h2 id="skills-h">Skills</h2>
   <p class="sub">What I reach for, grouped by the job it does.</p>
   <div class="skills">
-    <div><h3>LLM &amp; agents</h3><ul><li>Gemini API</li><li>LangGraph</li><li>LangChain</li><li>RAG</li><li>Prompt engineering</li><li>Guardrails</li><li>vLLM</li><li>Fine-tuning</li></ul></div>
+    <div><h3>LLM &amp; agents</h3><ul><li>Gemini API</li><li>LangGraph</li><li>LangChain</li><li>RAG</li><li>Prompt engineering</li><li>Guardrails</li><li>Fine-tuning</li></ul></div>
     <div><h3>Retrieval</h3><ul><li>Qdrant</li><li>ChromaDB</li><li>bge-m3</li><li>BM25</li><li>Reciprocal rank fusion</li></ul></div>
     <div><h3>Evaluation &amp; tracing</h3><ul><li>Golden sets</li><li>MRR / Recall@k</li><li>Bootstrap CIs</li><li>Wilson intervals</li><li>Langfuse</li><li>Latency &amp; cost</li></ul></div>
     <div><h3>Backend &amp; DevOps</h3><ul><li>Python</li><li>FastAPI</li><li>.NET 8</li><li>GraphQL</li><li>MongoDB</li><li>PostgreSQL</li><li>SQL Server</li><li>Docker</li><li>GitHub Actions</li><li>AWS basics</li></ul></div>
