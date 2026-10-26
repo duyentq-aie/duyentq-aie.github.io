@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tran Quang Duyen — AI Engineer</title>
-<meta name="description" content="AI engineer building LLM applications that are measured before they ship: RAG, agents, evaluation and observability.">
+<meta name="description" content="AI engineer building LLM applications that are measured before they ship: RAG, agents, evaluation and observability. Also computer vision with YOLO and OpenCV.">
 <meta property="og:title" content="Tran Quang Duyen — AI Engineer">
 <meta property="og:description" content="RAG + agent systems, evaluated on a locked test set and traced end to end.">
 <meta property="og:image" content="assets/monitor-journey.webp">
@@ -203,6 +203,10 @@ figcaption{font-size:13.5px;color:var(--muted);margin-top:8px}
 .links{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
 .links a{font-weight:600;font-size:15px;text-decoration:none;padding:9px 14px;border-radius:10px;background:var(--accent-tint)}
 
+/* sentinel video */
+.vid{aspect-ratio:16/9;background:#05061A}
+.vid video{width:100%;height:100%;display:block;object-fit:cover}
+
 /* devprep illustration */
 .room{background:var(--night);border-radius:20px;padding:18px;color:var(--night-ink);position:relative;overflow:hidden}
 .room .cam{position:relative;aspect-ratio:4/3;border-radius:14px;background:radial-gradient(circle at 50% 40%,#2A3170,#11143A 70%);overflow:hidden}
@@ -250,11 +254,11 @@ figcaption{font-size:13.5px;color:var(--muted);margin-top:8px}
 @media (max-width:600px){.tl{grid-template-columns:1fr}}
 
 /* skills */
-.skills{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.skills{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
 @media (max-width:960px){.skills{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:560px){.skills{grid-template-columns:1fr}}
 .skills div{border-radius:18px;padding:20px;background:color-mix(in srgb,var(--kc) 10%,var(--surface));border:1px solid color-mix(in srgb,var(--kc) 30%,var(--line))}
-.skills div:nth-child(1){--kc:var(--c-intent)}.skills div:nth-child(2){--kc:var(--c-retrieval)}.skills div:nth-child(3){--kc:var(--c-answer)}.skills div:nth-child(4){--kc:var(--c-filter)}
+.skills div:nth-child(1){--kc:var(--c-intent)}.skills div:nth-child(2){--kc:var(--c-retrieval)}.skills div:nth-child(3){--kc:var(--c-answer)}.skills div:nth-child(4){--kc:var(--c-filter)}.skills div:nth-child(5){--kc:var(--c-guard)}
 .skills h3{font-size:17px;margin-bottom:10px}
 .skills ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
 .skills li{font-size:13.5px;padding:3px 9px;border-radius:8px;background:var(--surface);border:1px solid var(--line)}
@@ -294,7 +298,7 @@ footer::before{content:"";position:absolute;right:-120px;bottom:-160px;width:420
       <div>
         <span class="status"><b aria-hidden="true"></b>Open to AI engineer roles · Vietnam or remote</span>
         <h1>I build LLM features <span class="grad">you can measure.</span></h1>
-        <p class="lede">AI engineer, FPT University IT graduate. My latest project, <strong>ShopMate</strong>, is a RAG + agent sales assistant for a Vietnamese fashion store, evaluated on a test set locked before its only run, and traced step by step in its own monitor.</p>
+        <p class="lede">AI engineer, FPT University IT graduate. My latest project, <strong>ShopMate</strong>, is a RAG + agent sales assistant for a Vietnamese fashion store, evaluated on a test set locked before its only run, and traced step by step in its own monitor. I also build computer vision: <strong>SentinelAI</strong> finds traffic violations in camera video with YOLO11 and OpenCV.</p>
         <div class="actions">
           <a class="btn primary" href="#work">See the work</a>
           <a class="btn" href="https://github.com/duyentq-aie" rel="noopener">GitHub</a>
@@ -352,7 +356,7 @@ footer::before{content:"";position:absolute;right:-120px;bottom:-160px;width:420
 
 <section id="work" aria-labelledby="work-h">
   <h2 id="work-h">Selected work</h2>
-  <p class="sub">Two systems, built end to end. Every number links back to a committed result file.</p>
+  <p class="sub">Three systems, built end to end. Every number links back to a committed result file.</p>
 
   <article class="project" aria-labelledby="sm-h">
     <div class="phead"><h3 id="sm-h">ShopMate — AI sales assistant for an online fashion store</h3><span class="ptag">Personal project, 2026</span></div>
@@ -402,6 +406,56 @@ footer::before{content:"";position:absolute;right:-120px;bottom:-160px;width:420
       <a href="https://github.com/duyentq-aie/shopmate" rel="noopener">Source code</a>
       <a href="https://github.com/duyentq-aie/shopmate/blob/main/docs/RESULTS-final.md" rel="noopener">Final results report</a>
       <a href="https://github.com/duyentq-aie/shopmate/blob/main/docs/PHASE8-PREREG.md" rel="noopener">Pre-registration</a>
+    </div>
+  </article>
+
+  <article class="project" aria-labelledby="sa-h">
+    <div class="phead"><h3 id="sa-h">SentinelAI — Traffic-violation detection from camera video</h3><span class="ptag">Personal project, 2026</span></div>
+    <ul class="stack" aria-label="Stack">
+      <li>Python</li><li>PyTorch</li><li>YOLO11</li><li>OpenCV</li><li>Object tracking</li><li>FastAPI</li><li>Kaggle GPU</li><li>Human review</li>
+    </ul>
+    <div class="cols">
+      <ul class="points">
+        <li>Finds violations in fixed traffic-camera video: riders without a helmet, motorbikes carrying more than two people, and red-light running checked per lane, with the traffic-light colour read by OpenCV.</li>
+        <li>YOLO11 trained on Kaggle to detect helmet, no-helmet and motorcycle. Each vehicle is tracked across frames, so a violation is reported once per vehicle, not once per frame.</li>
+        <li>The original dataset put frames of the same video in both train and test: 75.6% of test images had a neighbouring frame in training. I re-split it by video and reported the honest numbers.</li>
+        <li>Tested on a camera the model never saw, with every alert checked by eye: the retrained model <b>halved false alarms</b>, from 32 to 16 per minute. Recall on that clip is not measured yet.</li>
+        <li>A FastAPI web app streams the annotated video, and a review page lets a person confirm or reject each alert. Decisions export as corrected labels for the next training round.</li>
+      </ul>
+
+      <div class="meter" id="meter-sa">
+        <h4>Leaky test vs. honest test (mAP50-95)</h4>
+        <div class="legend"><span><i style="background:color-mix(in srgb,var(--accent) 45%,var(--surface))"></i>Random frame split</span><span><i style="background:linear-gradient(90deg,var(--c-intent),var(--c-retrieval))"></i>Split by video</span></div>
+        <div class="mrow"><span>Helmet</span><span class="bars"><span class="b dev"><i style="--w:79.1%"></i></span><span class="b test"><i style="--w:62.3%"></i></span></span><span class="v">0.791<small>0.623</small></span></div>
+        <div class="mrow"><span>Motorcycle</span><span class="bars"><span class="b dev"><i style="--w:87.8%"></i></span><span class="b test"><i style="--w:82.8%"></i></span></span><span class="v">0.878<small>0.828</small></span></div>
+        <div class="mrow weak"><span>No helmet</span><span class="bars"><span class="b dev"><i style="--w:76.8%"></i></span><span class="b test"><i style="--w:45.3%"></i></span></span><span class="v">0.768<small>0.453</small></span></div>
+        <div class="mrow"><span>All classes</span><span class="bars"><span class="b dev"><i style="--w:81.2%"></i></span><span class="b test"><i style="--w:63.5%"></i></span></span><span class="v">0.812<small>0.635</small></span></div>
+        <div class="kpis">
+          <div><b>0.934</b><span>mAP50 on videos never seen in training</span></div>
+          <div><b>32 → 16</b><span>false alarms per minute, new camera</span></div>
+        </div>
+        <p class="note">The two test sets hold different images, so not all of the drop is leakage. mAP50-95 is also held down by loose label boxes.</p>
+        <div class="lesson"><b>What the data taught me.</b> The first model's 0.81 came from a test set that shared frames with training. On a camera it had never seen, every alarm in a 26-second clip was false, so now a person confirms each alert before it counts. Next: video with real violations, to measure recall.</div>
+      </div>
+    </div>
+
+    <div class="shots">
+      <figure>
+        <div class="window">
+          <div class="bar"><i></i><i></i><i></i><span>sentinel · live view (anonymised)</span></div>
+          <div class="vid"><video src="assets/sentinel-demo.mp4" poster="assets/sentinel-poster.webp" autoplay muted loop playsinline preload="metadata" aria-label="Annotated traffic video: tracked motorcycles and cars, helmet labels, light status and a pending-review banner"></video></div>
+        </div>
+        <figcaption>Tracked vehicles, helmet labels and light status. Plates are pixelated and faces blurred; every alert waits for review.</figcaption>
+      </figure>
+      <div class="stackshots">
+        <figure><a href="assets/sentinel-review.webp"><div class="window"><div class="bar"><i></i><i></i><i></i><span>review queue</span></div><img src="assets/sentinel-review.webp" alt="Event review page with the person crop, the whole frame and buttons to confirm or reject the alert" loading="lazy" width="1380" height="660"></div></a><figcaption>The review page: confirm, reject or mark unclear, one key per decision.</figcaption></figure>
+      </div>
+    </div>
+
+    <div class="links">
+      <a href="https://github.com/duyentq-aie/SentinelAI" rel="noopener">Source code</a>
+      <a href="https://github.com/duyentq-aie/SentinelAI/blob/main/docs/REPORT.md" rel="noopener">Report</a>
+      <a href="https://github.com/duyentq-aie/SentinelAI/releases/tag/models-v1" rel="noopener">Model release</a>
     </div>
   </article>
 
@@ -464,6 +518,7 @@ footer::before{content:"";position:absolute;right:-120px;bottom:-160px;width:420
   <p class="sub">What I reach for, grouped by the job it does.</p>
   <div class="skills">
     <div><h3>LLM &amp; agents</h3><ul><li>Gemini API</li><li>LangGraph</li><li>LangChain</li><li>RAG</li><li>Prompt engineering</li><li>Guardrails</li><li>Fine-tuning</li></ul></div>
+    <div><h3>Computer vision</h3><ul><li>YOLO (Ultralytics)</li><li>Object tracking</li><li>OpenCV</li><li>Face recognition</li><li>Data labelling</li><li>P / R / mAP</li></ul></div>
     <div><h3>Retrieval</h3><ul><li>Qdrant</li><li>ChromaDB</li><li>bge-m3</li><li>BM25</li><li>Reciprocal rank fusion</li></ul></div>
     <div><h3>Evaluation &amp; tracing</h3><ul><li>Golden sets</li><li>MRR / Recall@k</li><li>Bootstrap CIs</li><li>Wilson intervals</li><li>Langfuse</li><li>Latency &amp; cost</li></ul></div>
     <div><h3>Backend &amp; DevOps</h3><ul><li>Python</li><li>FastAPI</li><li>.NET 8</li><li>GraphQL</li><li>MongoDB</li><li>PostgreSQL</li><li>SQL Server</li><li>Docker</li><li>GitHub Actions</li><li>AWS basics</li></ul></div>
@@ -481,7 +536,7 @@ footer::before{content:"";position:absolute;right:-120px;bottom:-160px;width:420
       <a class="btn" href="https://github.com/duyentq-aie" rel="noopener">GitHub</a>
       <a class="btn" href="cv.pdf">CV (PDF)</a>
     </div>
-    <p class="small">Vietnamese (native), English (technical reading, work meetings). Product photos in the demo store: Unsplash and Pexels licences, credited in the repo.</p>
+    <p class="small">Vietnamese (native), English (reads technical documentation). Product photos in the demo store: Unsplash and Pexels licences, credited in the repo.</p>
   </div>
 </footer>
 
@@ -494,10 +549,11 @@ footer::before{content:"";position:absolute;right:-120px;bottom:-160px;width:420
   for (var w = 0; w < 36; w++){ var i = document.createElement('i'); i.style.animationDelay = (-(w*137)%1100)/1000 + 's'; i.style.animationDuration = (0.7 + (w*53%60)/100) + 's'; wave.appendChild(i); }
 
   /* result bars grow when visible */
-  var meter = document.getElementById('meter');
-  if ('IntersectionObserver' in window && !reduce){
-    new IntersectionObserver(function(es, o){ es.forEach(function(e){ if (e.isIntersecting){ meter.classList.add('in'); o.disconnect(); } }); }, {threshold:.3}).observe(meter);
-  } else meter.classList.add('in');
+  document.querySelectorAll('.meter').forEach(function(meter){
+    if ('IntersectionObserver' in window && !reduce){
+      new IntersectionObserver(function(es, o){ es.forEach(function(e){ if (e.isIntersecting){ meter.classList.add('in'); o.disconnect(); } }); }, {threshold:.3}).observe(meter);
+    } else meter.classList.add('in');
+  });
 
   if (reduce) return;
 
